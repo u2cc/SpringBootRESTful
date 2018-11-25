@@ -1,3 +1,3 @@
 # SpringBootRESTful
 
-This is a practice project of implementing RESTful endpoint using SpringBoot.
+This is a practice project of implementing RESTful endpoints using SpringBoot.
