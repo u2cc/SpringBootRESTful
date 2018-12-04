@@ -5,15 +5,20 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rest.model.Greeting;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+@Api(value="RESTful Endpoints")
 @RestController
-public class SpringBootRESTfulController {
+public class SpringBootRestfulController {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRESTfulController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
 	private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
 
@@ -24,7 +29,8 @@ public class SpringBootRESTfulController {
      * @param name
      * @return
      */
-    @RequestMapping("/greeting")
+    @ApiOperation(value = "Greet everyone")
+    @RequestMapping(path="/greeting", method=RequestMethod.GET)
     public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
     	LOGGER.info("Receiving name variabe: "+name+".");
         return new Greeting(counter.incrementAndGet(),
