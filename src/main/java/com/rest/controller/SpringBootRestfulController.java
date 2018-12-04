@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rest.model.Greeting;
 
 @RestController
-public class SpringBootRESTfulController {
+public class SpringBootRestfulController {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRESTfulController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
 	private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
 
