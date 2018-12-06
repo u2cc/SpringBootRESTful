@@ -14,6 +14,11 @@ import com.rest.model.Greeting;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
+/**
+ * Controller class for all the endpoints configruations
+ * @author James Chen
+ *
+ */
 @Api(value="RESTful Endpoints")
 @RestController
 public class SpringBootRestfulController {

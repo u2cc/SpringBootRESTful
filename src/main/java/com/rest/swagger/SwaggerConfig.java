@@ -19,6 +19,7 @@ import static springfox.documentation.builders.PathSelectors.regex;
 /**
  * http://localhost:8080/swagger-ui.html#/
  * http://localhost:8080/v2/api-docs
+ * 
  * @author James Chen
  *
  */
