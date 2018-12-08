@@ -13,6 +13,7 @@ import com.rest.model.Greeting;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 /**
  * Controller class for all the endpoints configruations
@@ -31,14 +32,19 @@ public class SpringBootRestfulController {
     /**
      * The above example does not specify GET vs. PUT, POST, and so forth, because @RequestMapping maps all HTTP operations by default. 
      * Use @RequestMapping(method=GET) to narrow this mapping.
+     * This endpoint handles in-path requet parameters instead of JSON therefore the use of @RequestParam
      * @param name
      * @return
      */
     @ApiOperation(value = "Greet everyone")
     @RequestMapping(path="/greeting", method=RequestMethod.GET)
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
+    public Greeting greeting(@ApiParam(value = "Name to be used in the response")@RequestParam(value="name", defaultValue="World") String name) {
     	LOGGER.info("Receiving name variabe: "+name+".");
         return new Greeting(counter.incrementAndGet(),
                             String.format(template, name));
+    }
+    
+    public Greeting greetingJSON() {
+    	return null;
     }
 }
