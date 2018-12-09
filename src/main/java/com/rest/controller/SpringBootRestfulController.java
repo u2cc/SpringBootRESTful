@@ -4,12 +4,15 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rest.model.Greeting;
+import com.rest.model.User;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,7 +47,17 @@ public class SpringBootRestfulController {
                             String.format(template, name));
     }
     
-    public Greeting greetingJSON() {
-    	return null;
+    /**
+     * This method consumes JSON object sent in the POST method.
+     * The annotation @RequestBody indicates a parameter is bound to the request for Spring to convert 
+     * MediaType is explicitly specified for restricting the supported content type
+     * @param user
+     * @return
+     */
+    @ApiOperation(value = "Return user infomation")
+    @RequestMapping(path="/userdetails", method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)      
+    public User getUserDetails(@ApiParam(value = "User Criteria",required=true)@RequestBody User user) {
+    	LOGGER.info("Receiving payload: " + user.toString());
+    	return user;
     }
 }
