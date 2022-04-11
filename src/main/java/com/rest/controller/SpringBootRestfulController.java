@@ -1,5 +1,6 @@
 package com.rest.controller;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -77,5 +78,17 @@ public class SpringBootRestfulController {
     public List<DiecastCar> getAllDiecastCars(){
         LOGGER.info("Fetching all diecast cars");
         return diecastCarService.list();
+    }
+
+    /**
+     * This method searches all the diecast cars from the brands in the given list
+     * @param brands List of brands of the diecast cars
+     * @return a list of all the diecast cars from the brands given
+     */
+    @ApiOperation(value="Find all cars by brands")
+    @RequestMapping(path = "/findDiecastCarsByBrand", method = RequestMethod.GET)
+    //need to figure out how to set @RequestParam defaultValue for a Collection
+    public List<DiecastCar> findDiecastCarsByBrands(@ApiParam(value="List of brands", required=true) @RequestParam(value="brands", defaultValue = "") Collection<String> brands){
+        return diecastCarService.findByBrands(brands);
     }
 }

@@ -4,9 +4,9 @@ import com.rest.entities.DiecastCar;
 import com.rest.repository.DiecastCarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -17,5 +17,9 @@ public class DiecastCarService {
 
     public List<DiecastCar> list(){
         return (List<DiecastCar>) diecastCarRepository.findAll();
+    }
+
+    public List<DiecastCar> findByBrands(Collection<String> brands){
+        return diecastCarRepository.findCarByBrandList(brands);
     }
 }
