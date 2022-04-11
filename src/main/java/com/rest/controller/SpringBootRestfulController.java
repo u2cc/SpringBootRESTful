@@ -6,15 +6,17 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import com.rest.entities.DiecastCar;
 import com.rest.services.DiecastCarService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.rest.model.Greeting;
 import com.rest.model.User;
@@ -24,7 +26,10 @@ import com.rest.model.User;
 //import io.swagger.annotations.ApiParam;
 
 /**
- * Controller class for all the endpoints configruations
+ * Controller class for all the endpoints configurations
+ * http://localhost:{server.port}/{springdoc.swagger-ui.path}
+ * http://localhost:{server.port}/{springdoc.api-docs.path}
+ *
  * @author James Chen
  *
  */
@@ -48,9 +53,18 @@ public class SpringBootRestfulController {
      * @return
      */
    // @ApiOperation(value = "Greet everyone")
+    @Operation(summary = "Greet everyone")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Greet the name given",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = " Page Not Found",
+                    content = @Content)
+    })
     @RequestMapping(path="/greeting", method=RequestMethod.GET)
     public Greeting greeting(//@ApiParam(value = "Name to be used in the response")
-                                 @RequestParam(value="name", defaultValue="World") String name) {
+                                 @Parameter(description = "Name to be greeted.") @RequestParam(value="name", defaultValue="World") String name) {
     	LOGGER.info("Receiving name variabe: "+name+".");
         return new Greeting(counter.incrementAndGet(),
                             String.format(template, name));
@@ -64,6 +78,15 @@ public class SpringBootRestfulController {
      * @return the user details encapsulated in a user Object.
      */
   //  @ApiOperation(value = "Return user infomation")
+    @Operation(summary = "Return user infomation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "Return the user info provided",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = " age Not Found",
+                    content = @Content)
+    })
     @RequestMapping(path="/userdetails", method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)      
     public User getUserDetails(//@ApiParam(value = "User Criteria",required=true)
                                    @RequestBody User user) {
@@ -76,6 +99,15 @@ public class SpringBootRestfulController {
      * @return a list of all the diecast cars
      */
    // @ApiOperation(value="List all diecast cars")
+    @Operation(summary = "List all diecast cars")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "List of all the cars from database",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "Page Not Found",
+                    content = @Content)
+    })
     @RequestMapping(path="/getAllDiecastCars", method=RequestMethod.GET)
     public List<DiecastCar> getAllDiecastCars(){
         LOGGER.info("Fetching all diecast cars");
@@ -88,12 +120,19 @@ public class SpringBootRestfulController {
      * @return a list of all the diecast cars from the brands given
      */
    // @ApiOperation(value="Find all cars by brands")
-    @RequestMapping(path = "/findDiecastCarsByBrand", method = RequestMethod.POST)
-    //need to figure out how to set @RequestParam defaultValue for a Collection
+    @Operation(summary = "Find all cars by brands")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "List of all the cars from the given brands",
+                    content = {@Content(mediaType = "application/json")}),
+            @ApiResponse(responseCode = "404",
+                    description = "Page Not Found",
+                    content = @Content)
+    })
+    @RequestMapping(path = "/findDiecastCarsByBrand", method = RequestMethod.GET)
+    //@ResponseStatus(HttpStatus.OK)
     public List<DiecastCar> findDiecastCarsByBrands(//@ApiParam(value="List of brands", defaultValue="Matchbox, Tongas")
-                                                        @RequestParam(value="brands", defaultValue = "Matchbox, Hot Wheels") List<String> brands){
+                                                        @Parameter(description = "Brands to search") @RequestParam(value="brands", defaultValue = "Matchbox, Hot Wheels") List<String> brands){
         return diecastCarService.findByBrands(brands);
     }
-
-
 }
