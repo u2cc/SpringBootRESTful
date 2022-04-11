@@ -19,7 +19,9 @@ import static springfox.documentation.builders.PathSelectors.regex;
 /**
  * http://localhost:8080/swagger-ui.html#/
  * http://localhost:8080/v2/api-docs
- * 
+ *
+ * The port number might be different, please refer to application.properties
+ *
  * @author James Chen
  *
  */

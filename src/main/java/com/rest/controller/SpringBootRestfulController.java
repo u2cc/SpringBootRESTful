@@ -1,7 +1,9 @@
 package com.rest.controller;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.rest.entities.DiecastCar;
 import com.rest.services.DiecastCarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +59,23 @@ public class SpringBootRestfulController {
      * The annotation @RequestBody indicates a parameter is bound to the request for Spring to convert 
      * MediaType is explicitly specified for restricting the supported content type
      * @param user
-     * @return
+     * @return the user details encapsulated in a user Object.
      */
     @ApiOperation(value = "Return user infomation")
     @RequestMapping(path="/userdetails", method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)      
     public User getUserDetails(@ApiParam(value = "User Criteria",required=true)@RequestBody User user) {
     	LOGGER.info("Receiving payload: " + user.toString());
     	return user;
+    }
+
+    /**
+     * This method returns a list containing all the diecast cars in the DB.
+     * @return a list of all the diecast cars
+     */
+    @ApiOperation(value="List all diecast cars")
+    @RequestMapping(path="/getAllDiecastCars", method=RequestMethod.GET)
+    public List<DiecastCar> getAllDiecastCars(){
+        LOGGER.info("Fetching all diecast cars");
+        return diecastCarService.list();
     }
 }
