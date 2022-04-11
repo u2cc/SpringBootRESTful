@@ -1,8 +1,8 @@
 package com.rest.model;
 
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+//import io.swagger.annotations.ApiModel;
+//import io.swagger.annotations.ApiModelProperty;
 
 /**
  * This class is a model class for carrying user info
@@ -10,7 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
  *
  */
 
-@ApiModel(value="User Model",description="Holds user criteria")
+//@ApiModel(value="User Model",description="Holds user criteria")
 public class User {
 	
 	//@JsonInclude(Include.NON_NULL) having this Jackson annotation will make the id 
@@ -28,7 +28,7 @@ public class User {
 	}
 	
 	//dataType can override the derived return type, not mandatory and used only if deemed necessary
-	@ApiModelProperty(value = "User id",dataType = "long",required=false)
+	//@ApiModelProperty(value = "User id",dataType = "long",required=false)
 	public Long getId() {
 		return id;
 	}
@@ -38,7 +38,7 @@ public class User {
 		this.id = id;
 	}
 
-	@ApiModelProperty(value = "User's first name",dataType="String",required=true )
+	//@ApiModelProperty(value = "User's first name",dataType="String",required=true )
 	public String getFirstName() {
 		return firstName;
 	}
@@ -48,7 +48,7 @@ public class User {
 		this.firstName = firstName;
 	}
 
-	@ApiModelProperty(value = "User's last name",dataType="String",required=true)
+	//@ApiModelProperty(value = "User's last name",dataType="String",required=true)
 	public String getLastName() {
 		return lastName;
 	}

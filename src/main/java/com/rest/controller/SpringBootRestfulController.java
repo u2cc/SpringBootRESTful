@@ -19,16 +19,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rest.model.Greeting;
 import com.rest.model.User;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+//import io.swagger.annotations.Api;
+//import io.swagger.annotations.ApiOperation;
+//import io.swagger.annotations.ApiParam;
 
 /**
  * Controller class for all the endpoints configruations
  * @author James Chen
  *
  */
-@Api(value="RESTful Endpoints")
+//@Api(value="RESTful Endpoints")
 @RestController
 public class SpringBootRestfulController {
 	
@@ -47,9 +47,10 @@ public class SpringBootRestfulController {
      * @param name
      * @return
      */
-    @ApiOperation(value = "Greet everyone")
+   // @ApiOperation(value = "Greet everyone")
     @RequestMapping(path="/greeting", method=RequestMethod.GET)
-    public Greeting greeting(@ApiParam(value = "Name to be used in the response")@RequestParam(value="name", defaultValue="World") String name) {
+    public Greeting greeting(//@ApiParam(value = "Name to be used in the response")
+                                 @RequestParam(value="name", defaultValue="World") String name) {
     	LOGGER.info("Receiving name variabe: "+name+".");
         return new Greeting(counter.incrementAndGet(),
                             String.format(template, name));
@@ -62,9 +63,10 @@ public class SpringBootRestfulController {
      * @param user
      * @return the user details encapsulated in a user Object.
      */
-    @ApiOperation(value = "Return user infomation")
+  //  @ApiOperation(value = "Return user infomation")
     @RequestMapping(path="/userdetails", method=RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)      
-    public User getUserDetails(@ApiParam(value = "User Criteria",required=true)@RequestBody User user) {
+    public User getUserDetails(//@ApiParam(value = "User Criteria",required=true)
+                                   @RequestBody User user) {
     	LOGGER.info("Receiving payload: " + user.toString());
     	return user;
     }
@@ -73,7 +75,7 @@ public class SpringBootRestfulController {
      * This method returns a list containing all the diecast cars in the DB.
      * @return a list of all the diecast cars
      */
-    @ApiOperation(value="List all diecast cars")
+   // @ApiOperation(value="List all diecast cars")
     @RequestMapping(path="/getAllDiecastCars", method=RequestMethod.GET)
     public List<DiecastCar> getAllDiecastCars(){
         LOGGER.info("Fetching all diecast cars");
@@ -85,10 +87,13 @@ public class SpringBootRestfulController {
      * @param brands List of brands of the diecast cars
      * @return a list of all the diecast cars from the brands given
      */
-    @ApiOperation(value="Find all cars by brands")
-    @RequestMapping(path = "/findDiecastCarsByBrand", method = RequestMethod.GET)
+   // @ApiOperation(value="Find all cars by brands")
+    @RequestMapping(path = "/findDiecastCarsByBrand", method = RequestMethod.POST)
     //need to figure out how to set @RequestParam defaultValue for a Collection
-    public List<DiecastCar> findDiecastCarsByBrands(@ApiParam(value="List of brands", required=true) @RequestParam(value="brands", defaultValue = "") Collection<String> brands){
+    public List<DiecastCar> findDiecastCarsByBrands(//@ApiParam(value="List of brands", defaultValue="Matchbox, Tongas")
+                                                        @RequestParam(value="brands", defaultValue = "Matchbox, Hot Wheels") List<String> brands){
         return diecastCarService.findByBrands(brands);
     }
+
+
 }

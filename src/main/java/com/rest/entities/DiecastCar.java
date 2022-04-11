@@ -1,13 +1,13 @@
 package com.rest.entities;
 
-import io.swagger.annotations.ApiModel;
+//import io.swagger.annotations.ApiModel;
 import javax.persistence.*;
 
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
-@ApiModel(value="Diecast cars Model",description="Holds diecast car info")
+//@ApiModel(value="Diecast cars Model",description="Holds diecast car info")
 
 @Entity
 @Table(name="diecast_cars")
