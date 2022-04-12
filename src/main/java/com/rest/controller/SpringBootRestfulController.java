@@ -2,9 +2,16 @@ package com.rest.controller;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.rest.entities.DiecastCar;
+import com.rest.exception.DiecastCarNotFoundException;
 import com.rest.services.DiecastCarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.rest.model.Greeting;
@@ -40,6 +48,7 @@ public class SpringBootRestfulController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
 	private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private DiecastCarService diecastCarService;
@@ -134,5 +143,18 @@ public class SpringBootRestfulController {
     public List<DiecastCar> findDiecastCarsByBrands(//@ApiParam(value="List of brands", defaultValue="Matchbox, Tongas")
                                                         @Parameter(description = "Brands to search") @RequestParam(value="brands", defaultValue = "Matchbox, Hot Wheels") List<String> brands){
         return diecastCarService.findByBrands(brands);
+    }
+
+    @RequestMapping(path = "/updateDiecastCar", method = RequestMethod.PATCH, consumes = "application/json-patch+json")
+    public ResponseEntity<DiecastCar> updateDieCastCar(@RequestParam Long id, @RequestBody JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
+        DiecastCar diecastCar = diecastCarService.findById(id).orElseThrow(DiecastCarNotFoundException::new);
+        DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
+        diecastCarService.updateDiecastCar(diecastCarPatched);
+        return ResponseEntity.ok(diecastCarPatched);
+    }
+
+    private DiecastCar applyPatchToDiecastCar(JsonPatch jsonPatch, DiecastCar diecastCar) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = jsonPatch.apply(objectMapper.convertValue(diecastCar, JsonNode.class));
+        return objectMapper.treeToValue(patched, DiecastCar.class);
     }
 }

@@ -25,6 +25,12 @@
         </dependency>
 
        <dependency>
+           <groupId>com.github.java-json-tools</groupId>
+           <artifactId>json-patch</artifactId>
+           <version>1.12</version>
+       </dependency>
+
+       <dependency>
            <groupId>org.springdoc</groupId>
            <artifactId>springdoc-openapi-ui</artifactId>
            <version>1.5.9</version>

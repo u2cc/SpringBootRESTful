@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class DiecastCarService {
@@ -21,5 +22,13 @@ public class DiecastCarService {
 
     public List<DiecastCar> findByBrands(Collection<String> brands){
         return diecastCarRepository.findCarByBrandList(brands);
+    }
+
+    public Optional<DiecastCar> findById(Long id){
+        return diecastCarRepository.findById(id);
+    }
+
+    public void updateDiecastCar(DiecastCar diecastCar){
+        diecastCarRepository.save(diecastCar);
     }
 }
