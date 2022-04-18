@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonpatch.JsonPatch;
 import com.github.fge.jsonpatch.JsonPatchException;
 import com.rest.entities.DiecastCar;
+import com.rest.exception.DiecastCarAlreadyExistsException;
 import com.rest.exception.DiecastCarNotFoundException;
 import com.rest.services.DiecastCarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -146,11 +147,24 @@ public class SpringBootRestfulController {
     }
 
     @RequestMapping(path = "/updateDiecastCar", method = RequestMethod.PATCH, consumes = "application/json-patch+json")
-    public ResponseEntity<DiecastCar> updateDieCastCar(@RequestParam Long id, @RequestBody JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
+    public ResponseEntity<DiecastCar> updateDiecastCar(@RequestParam Long id, @RequestBody JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
         DiecastCar diecastCar = diecastCarService.findById(id).orElseThrow(DiecastCarNotFoundException::new);
         DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
         diecastCarService.updateDiecastCar(diecastCarPatched);
         return ResponseEntity.ok(diecastCarPatched);
+    }
+
+    @PostMapping(path="/addDiecastCar")
+    public void addDiecastCar(@RequestBody DiecastCar diecastCar){
+        if(diecastCarService.ifPresent(diecastCar)){
+            throw new DiecastCarAlreadyExistsException();
+        }
+        diecastCarService.saveDieCastCar(diecastCar);
+    }
+
+    @DeleteMapping("/deleteDiecastCar/{id}")
+    void deleteEmployee(@PathVariable Long id) {
+        diecastCarService.deleteById(id);
     }
 
     private DiecastCar applyPatchToDiecastCar(JsonPatch jsonPatch, DiecastCar diecastCar) throws JsonPatchException, JsonProcessingException {

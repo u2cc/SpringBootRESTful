@@ -12,7 +12,10 @@ import java.sql.Date;
 @Entity
 @Table(name="diecast_cars")
 public class DiecastCar {
-    @Id @GeneratedValue(strategy=GenerationType.AUTO)
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id")
     private Long id;
     private String brand;
     private String series;

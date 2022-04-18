@@ -24,11 +24,24 @@ public class DiecastCarService {
         return diecastCarRepository.findCarByBrandList(brands);
     }
 
+    public boolean ifPresent(DiecastCar diecastCar){
+        if(null!=diecastCar.getId()) {
+            return diecastCarRepository.existsById(diecastCar.getId());
+        }else{
+            return false;
+        }
+    }
+
+    public void deleteById(long id){
+        diecastCarRepository.deleteById(id);
+    }
+
     public Optional<DiecastCar> findById(Long id){
         return diecastCarRepository.findById(id);
     }
-
     public void updateDiecastCar(DiecastCar diecastCar){
         diecastCarRepository.save(diecastCar);
     }
+    public void saveDieCastCar(DiecastCar diecastCar) {diecastCarRepository.save(diecastCar);}
+
 }
