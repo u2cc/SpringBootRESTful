@@ -163,7 +163,7 @@ public class SpringBootRestfulController {
     }
 
     @DeleteMapping("/deleteDiecastCar/{id}")
-    void deleteEmployee(@PathVariable Long id) {
+    void deleteDiecastCar(@PathVariable Long id) {
         diecastCarService.deleteById(id);
     }
 

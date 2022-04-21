@@ -6,5 +6,7 @@ Patch operation Json example:
 [{
 "op":"replace",
 "path":"/color",
-"value":"orange"
+"value":"red"
 }]
+
+

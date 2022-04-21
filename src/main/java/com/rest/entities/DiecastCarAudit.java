@@ -1,25 +1,25 @@
 package com.rest.entities;
 
-//import io.swagger.annotations.ApiModel;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-
-
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-//@ApiModel(value="Diecast cars Model",description="Holds diecast car info")
+/**
+ * @author u2cc
+ */
 
 @Entity
-@Table(name="diecast_cars")
-public class DiecastCar {
-
+@Table(name="diecast_cars_audit")
+public class DiecastCarAudit {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     @Column(name="id")
     private Long id;
+
+    private Long diecastcar_id;
     private String brand;
     private String series;
     private String make;
@@ -28,12 +28,22 @@ public class DiecastCar {
     private String color;
     private String body_style;
     private java.sql.Date purchase_date;
+
+    @Column(name="purchase_location")
+    private String location;
+    private String action;
+
     @CreationTimestamp
     private java.sql.Timestamp ts;
 
-    //for the purpose of showcasing explicit column mapping, we give a param name other than the one of the column
-    @Column(name="purchase_location")
-    private String location;
+
+    public Long getDiecastcar_id() {
+        return diecastcar_id;
+    }
+
+    public void setDiecastcar_id(Long diecastcar_id) {
+        this.diecastcar_id = diecastcar_id;
+    }
 
     public Long getId() {
         return id;
@@ -115,6 +125,13 @@ public class DiecastCar {
         this.location = location;
     }
 
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
 
     public Timestamp getTs() {
         return ts;
@@ -123,6 +140,5 @@ public class DiecastCar {
     public void setTs(Timestamp ts) {
         this.ts = ts;
     }
-
 
 }
