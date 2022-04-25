@@ -1,5 +1,10 @@
 package com.rest.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.rest.Util;
 import com.rest.entities.DiecastCar;
 import com.rest.entities.DiecastCarAudit;
@@ -20,11 +25,14 @@ public class DiecastCarService {
 
     private static final String DELETE = "D";
     private static final String INSERT = "I";
+    private static final String UPDATE = "U";
 
     @Autowired
     private DiecastCarRepository diecastCarRepository;
     @Autowired
     private DiecastCarAuditRepository diecastCarAuditRepository;
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public List<DiecastCar> list(){
         return (List<DiecastCar>) diecastCarRepository.findAll();
@@ -51,11 +59,20 @@ public class DiecastCarService {
         diecastCarAuditRepository.save(diecastCarAudit);
     }
 
+    @Transactional
     public Optional<DiecastCar> findById(Long id){
         return diecastCarRepository.findById(id);
     }
-    public void updateDiecastCar(DiecastCar diecastCar){
-        diecastCarRepository.save(diecastCar);
+
+    @Transactional
+    public DiecastCar updateDiecastCar(Long id, JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
+        DiecastCar diecastCar = diecastCarRepository.findById(id).orElseThrow(DiecastCarNotFoundException::new);
+        DiecastCarAudit diecastCarAudit = Util.toDiecastCarAudit(diecastCar);
+        diecastCarAudit.setAction(UPDATE);
+        diecastCarAuditRepository.save(diecastCarAudit);
+        DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
+        diecastCarRepository.save(diecastCarPatched);
+        return diecastCarPatched;
     }
 
     @Transactional
@@ -64,6 +81,11 @@ public class DiecastCarService {
         DiecastCarAudit diecastCarAudit = Util.toDiecastCarAudit(diecastCar);
         diecastCarAudit.setAction(INSERT);
         diecastCarAuditRepository.save(diecastCarAudit);
+    }
+
+    private DiecastCar applyPatchToDiecastCar(JsonPatch jsonPatch, DiecastCar diecastCar) throws JsonPatchException, JsonProcessingException {
+        JsonNode patched = jsonPatch.apply(objectMapper.convertValue(diecastCar, JsonNode.class));
+        return objectMapper.treeToValue(patched, DiecastCar.class);
     }
 
 }

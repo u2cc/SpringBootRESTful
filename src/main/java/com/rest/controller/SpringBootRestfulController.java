@@ -49,7 +49,6 @@ public class SpringBootRestfulController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
 	private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private DiecastCarService diecastCarService;
@@ -148,9 +147,7 @@ public class SpringBootRestfulController {
 
     @RequestMapping(path = "/updateDiecastCar", method = RequestMethod.PATCH, consumes = "application/json-patch+json")
     public ResponseEntity<DiecastCar> updateDiecastCar(@RequestParam Long id, @RequestBody JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
-        DiecastCar diecastCar = diecastCarService.findById(id).orElseThrow(DiecastCarNotFoundException::new);
-        DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
-        diecastCarService.updateDiecastCar(diecastCarPatched);
+        DiecastCar diecastCarPatched = diecastCarService.updateDiecastCar(id, jsonPatch);
         return ResponseEntity.ok(diecastCarPatched);
     }
 
@@ -167,8 +164,5 @@ public class SpringBootRestfulController {
         diecastCarService.deleteById(id);
     }
 
-    private DiecastCar applyPatchToDiecastCar(JsonPatch jsonPatch, DiecastCar diecastCar) throws JsonPatchException, JsonProcessingException {
-        JsonNode patched = jsonPatch.apply(objectMapper.convertValue(diecastCar, JsonNode.class));
-        return objectMapper.treeToValue(patched, DiecastCar.class);
-    }
+
 }
