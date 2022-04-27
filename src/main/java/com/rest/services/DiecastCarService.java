@@ -72,6 +72,7 @@ public class DiecastCarService {
         diecastCarAuditRepository.save(diecastCarAudit);
         DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
         diecastCarRepository.save(diecastCarPatched);
+       // if(1==1) throw new DiecastCarNotFoundException();
         return diecastCarPatched;
     }
 
