@@ -13,18 +13,29 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.rest.entities.DiecastCar;
 import com.rest.exception.DiecastCarAlreadyExistsException;
 import com.rest.exception.DiecastCarNotFoundException;
+import com.rest.security.JwtTokenUtil;
 import com.rest.services.DiecastCarService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.rest.model.Greeting;
@@ -44,6 +55,9 @@ import com.rest.model.User;
  */
 //@Api(value="RESTful Endpoints")
 @RestController
+@SecurityScheme(name = "diecast-api", scheme = "Bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER, bearerFormat = "JWT")
+
+
 public class SpringBootRestfulController {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
@@ -52,6 +66,11 @@ public class SpringBootRestfulController {
 
     @Autowired
     private DiecastCarService diecastCarService;
+
+    @Autowired
+    JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    AuthenticationManager authenticationManager;
 
     
     /**
@@ -162,6 +181,35 @@ public class SpringBootRestfulController {
     @DeleteMapping("/deleteDiecastCar/{id}")
     void deleteDiecastCar(@PathVariable Long id) {
         diecastCarService.deleteById(id);
+    }
+
+    @SecurityRequirement(
+            name = "diecast-api",
+            scopes = {""})
+    @GetMapping(path="/getTokenUsername")
+    public ResponseEntity<Object> getTokenUserName(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userDetails);
+    }
+
+
+    @PostMapping("login")
+    public ResponseEntity<String> login( @RequestParam(value="username") String username,@RequestParam(value="password") String password) {
+        try {
+            Authentication authenticate = authenticationManager
+                    .authenticate(
+                            new UsernamePasswordAuthenticationToken(
+                                    username, password
+                            )
+                    );
+
+            UserDetails user = (UserDetails) authenticate.getPrincipal();
+
+            return ResponseEntity.ok(jwtTokenUtil.generateToken(user));
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
 
