@@ -10,6 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author u2cc
@@ -63,4 +65,12 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return enabled;
     }
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "user_role_mapping",
+            joinColumns = { @JoinColumn(name = "user_id", referencedColumnName = "id") },
+            inverseJoinColumns = { @JoinColumn(name = "role_id", table = "roles", referencedColumnName = "id") }
+    )
+    Set<Role> roles = new HashSet<>();
 }
