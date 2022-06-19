@@ -28,5 +28,15 @@ public class Role {
     //Need to break otherwise infinite recursion as a result of mutual reference between users and roles
     private Set<User> users = new HashSet<>();
 
+    public Role() { }
+
+    public Role(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return this.name;
+    }
 
 }

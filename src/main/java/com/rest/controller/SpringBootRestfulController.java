@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -187,6 +188,8 @@ public class SpringBootRestfulController {
             name = "diecast-api",
             scopes = {""})
     @GetMapping(path="/getTokenUsername")
+   //@RolesAllowed("ADMIN")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     public ResponseEntity<Object> getTokenUserName(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -204,7 +207,7 @@ public class SpringBootRestfulController {
                             )
                     );
 
-            UserDetails user = (UserDetails) authenticate.getPrincipal();
+            com.rest.entities.User user = (com.rest.entities.User ) authenticate.getPrincipal();
 
             return ResponseEntity.ok(jwtTokenUtil.generateToken(user));
         } catch (BadCredentialsException ex) {

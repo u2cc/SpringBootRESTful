@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         authenticationManagerBuilder.userDetailsService(
                 username -> userRepository.findByUsername(username).orElseThrow(
                         () -> new UsernameNotFoundException(
-                String.format("User: %s, not found", username)))).passwordEncoder(passwordEncoder);
+                                String.format("User: %s, not found", username)))).passwordEncoder(passwordEncoder);
     }
 
     @Override
@@ -74,8 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // Set permissions on endpoints
         http.authorizeRequests()
                 // Our public endpoints
-                .antMatchers("/**/**").permitAll()
-               .antMatchers("/**/**/**").permitAll()
+                .antMatchers("/**").permitAll()
 //                .antMatchers(HttpMethod.POST, "/api/author/search").permitAll()
 //                .antMatchers(HttpMethod.GET, "/api/book/**").permitAll()
 //                .antMatchers(HttpMethod.POST, "/api/book/search").permitAll()

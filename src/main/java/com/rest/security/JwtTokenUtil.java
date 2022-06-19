@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.function.Function;
 
+
+import com.rest.entities.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,17 +50,17 @@ public class JwtTokenUtil implements Serializable {
         return expiration.before(new Date());
     }    //generate token for user
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return doGenerateToken(claims, userDetails);
     }    //while creating the token -
 
     //1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID
     //2. Sign the JWT using the HS512 algorithm and secret key.
     //3. According to JWS Compact Serialization(https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
     //   compaction of the JWT to a URL-safe string
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+    private String doGenerateToken(Map<String, Object> claims, User userDetails) {
+        return Jwts.builder().setClaims(claims).setSubject(userDetails.getUsername()).claim("roles", userDetails.getRoles().toString()).setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512, secret).compact();
     }
@@ -69,10 +71,19 @@ public class JwtTokenUtil implements Serializable {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
+    public Claims parseClaims(String token) {
+        return Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
     public static void main(String[] args){
         Map<String, Object> claims = new HashMap<>();
         String username = "u2cc";
-        System.out.println(new JwtTokenUtil().doGenerateToken(claims, username));
+        User user = new User();
+        user.setUsername("u2cc");
+        System.out.println(new JwtTokenUtil().doGenerateToken(claims, user));
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         System.out.println(bCryptPasswordEncoder.encode("password"));
     }
