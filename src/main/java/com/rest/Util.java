@@ -2,12 +2,16 @@ package com.rest;
 
 import com.rest.entities.DiecastCar;
 import com.rest.entities.DiecastCarAudit;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * @author u2cc
  */
 public class Util {
     public static DiecastCarAudit toDiecastCarAudit(DiecastCar diecastCar){
+
         DiecastCarAudit diecastCarAudit = new DiecastCarAudit();
         diecastCarAudit.setBody_style(diecastCar.getBody_style());
         diecastCarAudit.setBrand(diecastCar.getBrand());

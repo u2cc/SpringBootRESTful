@@ -12,6 +12,9 @@ import com.rest.exception.DiecastCarNotFoundException;
 import com.rest.repository.DiecastCarAuditRepository;
 import com.rest.repository.DiecastCarRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +57,10 @@ public class DiecastCarService {
     public void deleteById(long id){
         DiecastCar diecastCar = diecastCarRepository.findById(id).orElseThrow(DiecastCarNotFoundException::new);
         diecastCarRepository.deleteById(id);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         DiecastCarAudit diecastCarAudit = Util.toDiecastCarAudit(diecastCar);
         diecastCarAudit.setAction(DELETE);
+        diecastCarAudit.setUser(authentication.getName());
         diecastCarAuditRepository.save(diecastCarAudit);
     }
 
@@ -67,8 +72,10 @@ public class DiecastCarService {
     @Transactional
     public DiecastCar updateDiecastCar(Long id, JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
         DiecastCar diecastCar = diecastCarRepository.findById(id).orElseThrow(DiecastCarNotFoundException::new);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         DiecastCarAudit diecastCarAudit = Util.toDiecastCarAudit(diecastCar);
         diecastCarAudit.setAction(UPDATE);
+        diecastCarAudit.setUser(authentication.getName());
         diecastCarAuditRepository.save(diecastCarAudit);
         DiecastCar diecastCarPatched = applyPatchToDiecastCar(jsonPatch, diecastCar);
         diecastCarRepository.save(diecastCarPatched);
@@ -79,8 +86,10 @@ public class DiecastCarService {
     @Transactional
     public void saveDieCastCar(DiecastCar diecastCar) {
         diecastCarRepository.save(diecastCar);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         DiecastCarAudit diecastCarAudit = Util.toDiecastCarAudit(diecastCar);
         diecastCarAudit.setAction(INSERT);
+        diecastCarAudit.setUser(authentication.getName());
         diecastCarAuditRepository.save(diecastCarAudit);
     }
 

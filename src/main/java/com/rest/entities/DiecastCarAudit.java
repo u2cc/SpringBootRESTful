@@ -12,11 +12,11 @@ import java.sql.Timestamp;
  */
 
 @Entity
-@Table(name="diecast_cars_audit")
+@Table(name = "diecast_cars_audit")
 public class DiecastCarAudit {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     private Long diecastcar_id;
@@ -29,7 +29,9 @@ public class DiecastCarAudit {
     private String body_style;
     private java.sql.Date purchase_date;
 
-    @Column(name="purchase_location")
+    private String user;
+
+    @Column(name = "purchase_location")
     private String location;
     private String action;
 
@@ -140,5 +142,9 @@ public class DiecastCarAudit {
     public void setTs(Timestamp ts) {
         this.ts = ts;
     }
+
+    public String getUser() { return user; }
+
+    public void setUser(String user) { this.user = user; }
 
 }

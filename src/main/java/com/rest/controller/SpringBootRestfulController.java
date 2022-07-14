@@ -13,6 +13,8 @@ import com.github.fge.jsonpatch.JsonPatchException;
 import com.rest.entities.DiecastCar;
 import com.rest.exception.DiecastCarAlreadyExistsException;
 import com.rest.exception.DiecastCarNotFoundException;
+import com.rest.exception.UserNotFoundException;
+import com.rest.model.LoginDto;
 import com.rest.security.JwtTokenUtil;
 import com.rest.services.DiecastCarService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -64,6 +66,7 @@ public class SpringBootRestfulController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringBootRestfulController.class);
 	private static final String template = "Hello, %s!";
     private final AtomicLong counter = new AtomicLong();
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Autowired
     private DiecastCarService diecastCarService;
@@ -78,8 +81,8 @@ public class SpringBootRestfulController {
      * The above example does not specify GET vs. PUT, POST, and so forth, because @RequestMapping maps all HTTP operations by default. 
      * Use @RequestMapping(method=GET) to narrow this mapping.
      * This endpoint handles in-path requet parameters instead of JSON therefore the use of @RequestParam
-     * @param name
-     * @return
+     * @param name name to be greeted
+     * @return The Greeting object
      */
    // @ApiOperation(value = "Greet everyone")
     @Operation(summary = "Greet everyone")
@@ -103,8 +106,8 @@ public class SpringBootRestfulController {
      * This method consumes JSON object sent in the POST method.
      * The annotation @RequestBody indicates a parameter is bound to the request for Spring to convert 
      * MediaType is explicitly specified for restricting the supported content type
-     * @param user
-     * @return the user details encapsulated in a user Object.
+     * @param user The user whose details will be returned.
+     * @return The user details encapsulated in a user Object.
      */
   //  @ApiOperation(value = "Return user infomation")
     @Operation(summary = "Return user infomation")
@@ -138,6 +141,10 @@ public class SpringBootRestfulController {
                     content = @Content)
     })
     @RequestMapping(path="/getAllDiecastCars", method=RequestMethod.GET)
+    @SecurityRequirement(
+            name = "diecast-api",
+            scopes = {""})
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')") //without this, authentication will allow all requests.
     public List<DiecastCar> getAllDiecastCars(){
         LOGGER.info("Fetching all diecast cars");
         return diecastCarService.list();
@@ -165,22 +172,48 @@ public class SpringBootRestfulController {
         return diecastCarService.findByBrands(brands);
     }
 
+    @SecurityRequirement(
+            name = "diecast-api",
+            scopes = {""})
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @RequestMapping(path = "/updateDiecastCar", method = RequestMethod.PATCH, consumes = "application/json-patch+json")
     public ResponseEntity<DiecastCar> updateDiecastCar(@RequestParam Long id, @RequestBody JsonPatch jsonPatch) throws JsonPatchException, JsonProcessingException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (ANONYMOUS_USER.equalsIgnoreCase(authentication.getName())) {
+            throw new UserNotFoundException();
+        }
         DiecastCar diecastCarPatched = diecastCarService.updateDiecastCar(id, jsonPatch);
         return ResponseEntity.ok(diecastCarPatched);
     }
 
+    @SecurityRequirement(
+            name = "diecast-api",
+            scopes = {""})
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @PostMapping(path="/addDiecastCar")
     public void addDiecastCar(@RequestBody DiecastCar diecastCar){
         if(diecastCarService.ifPresent(diecastCar)){
             throw new DiecastCarAlreadyExistsException();
         }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (ANONYMOUS_USER.equalsIgnoreCase(authentication.getName())) {
+           throw new UserNotFoundException();
+        }
+
         diecastCarService.saveDieCastCar(diecastCar);
     }
 
+    @SecurityRequirement(
+            name = "diecast-api",
+            scopes = {""})
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'MANAGER')")
     @DeleteMapping("/deleteDiecastCar/{id}")
     void deleteDiecastCar(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (ANONYMOUS_USER.equalsIgnoreCase(authentication.getName())) {
+            throw new UserNotFoundException();
+        }
         diecastCarService.deleteById(id);
     }
 
@@ -198,12 +231,12 @@ public class SpringBootRestfulController {
 
 
     @PostMapping("login")
-    public ResponseEntity<String> login( @RequestParam(value="username") String username,@RequestParam(value="password") String password) {
+    public ResponseEntity<String> login( @RequestBody LoginDto loginDto) {
         try {
             Authentication authenticate = authenticationManager
                     .authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    username, password
+                                    loginDto.getUsernameOrEmail(), loginDto.getPassword()
                             )
                     );
 

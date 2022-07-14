@@ -30,4 +30,10 @@ public class DiecastCarExceptionController {
         return new ResponseEntity<>("Diecast car already exists.", HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(value={UserNotFoundException.class})
+    public ResponseEntity<Object> handleUserNotFoundException(DiecastCarAlreadyExistsException exception){
+        return new ResponseEntity<>("User not found. Please authenticate using correct credentials", HttpStatus.NOT_FOUND);
+    }
+
+
 }
