@@ -1,7 +1,10 @@
 package com.rest.security;
 
+import com.rest.exception.UserNotFoundException;
 import com.rest.repository.UserRepository;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * @author u2cc
  */
 @Component
+@Order(1)
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
@@ -35,9 +39,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
             throws ServletException, IOException {
         // Get authorization header and validate
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -55,7 +59,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 .findByUsername(jwtTokenUtil.getUsernameFromToken(token))
                 .orElse(null);
 
-        if (!jwtTokenUtil.validateToken(token, userDetails)) {
+        if (null==userDetails||!jwtTokenUtil.validateToken(token, userDetails)) {
             chain.doFilter(request, response);
             return;
         }
